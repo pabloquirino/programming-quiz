@@ -5,7 +5,7 @@ const quizzContainer = document.querySelector('#quizz-container')
 const scoreContainer = document.querySelector('#score-container')
 const letters = ['a', 'b', 'c', 'd']
 let points = 0
-let actualQuestions = 0
+let actualQuestion = 0
 
 // questions
 const questions = [
@@ -98,7 +98,7 @@ const questions = [
 
 // quiz replacement for first question
 function init() {
-    createQuestion(actualQuestions)
+    createQuestion(actualQuestion)
 }
 
 // create question
@@ -139,14 +139,92 @@ function createQuestion(i) {
 
         // insert click event on buttons
         answerTemplate.addEventListener('click', function() {
-
+            checkAnswer(this)
         })
 
     })
 
-    actualQuestions++
-    
+    actualQuestion++
+
 }
+
+// checking user response
+function checkAnswer(btn) {
+    
+    const buttons = answerBox.querySelectorAll('button')
+
+    buttons.forEach(function(button) {
+
+        if(button.getAttribute('correct-answer') === 'true') {
+
+            button.classList.add('correct-answer')
+
+            // checks if the user answered the question correctly
+            if(btn === button) {
+                points++
+            }
+
+        } else {
+
+            button.classList.add('wrong-answer')
+
+        }
+
+    })
+
+
+    nextQuestion()
+
+}
+
+function nextQuestion() {
+
+    setTimeout(function() {
+
+        if(actualQuestion >= questions.length) {
+            showSuccessMessage()
+            return
+        } 
+
+        createQuestion(actualQuestion)
+
+    }, 700)
+
+}
+
+// displays the completion screen
+function showSuccessMessage() {
+
+    hideOrShowQuizz()
+
+    // score calculation
+    const score = ((points / questions.length) * 100)
+
+    const displayScore = document.querySelector('#display-score span')
+    displayScore.textContent = score.toString()
+
+    const correctAnswers = document.querySelector('#correct-answer')
+    correctAnswers.textContent = points
+
+    const totalQuestions = document.querySelector('#questions-qty')
+    totalQuestions.textContent = questions.length
+
+}
+
+function hideOrShowQuizz() {
+    quizzContainer.classList.toggle('hide')
+    scoreContainer.classList.toggle('hide')
+}
+
+const restartBtn = document.querySelector('#restart')
+
+restartBtn.addEventListener('click', function() {
+
+    actualQuestion = 0
+    points = 0
+    hideOrShowQuizz()
+    init()
+})
 
 // quiz initialization
 init()
